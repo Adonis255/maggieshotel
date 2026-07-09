@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body { padding: 20px; background: #0a0a0a; color: #fff; }
+        .admin-form { background: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; }
+        .admin-form input, .admin-form select { padding: 8px; border-radius: 5px; border: none; flex: 1; min-width: 150px; }
+        .admin-form button { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #444; padding: 10px; text-align: left; }
+        th { background: #d40000; }
+        .btn { padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-add { background: #27ae60; color: white; }
+        .btn-del { background: #c0392b; color: white; }
+        .btn-del-small { background: #c0392b; color: white; font-size: 0.8rem; margin-left: 5px;}
+        img.admin-img { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+        .cat-item { display: inline-block; background: #333; padding: 5px 10px; border-radius: 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1 style="color: #d40000;">Maggies Admin Panel</h1>
+    <a href="/" style="color:white;">Back to Menu</a> | <a href="/admin/logout" style="color:red;">Logout</a>
+    
+    <!-- MANAGE CATEGORIES SECTION -->
+    <h2 style="margin-top: 30px;">Manage Categories</h2>
+    <div class="admin-form" style="display: flex;">
+        <input type="text" id="newCatName" placeholder="New Category Name" style="flex: 1;">
+        <button class="btn-add" onclick="addCategory()">Add Category</button>
+    </div>
+    <div id="catList"></div>
+
+    <!-- ADD NEW DISH SECTION -->
+    <h2 style="margin-top: 30px;">Add New Dish</h2>
+    <form class="admin-form" id="addDishForm">
+        <input type="text" name="name" placeholder="Dish Name" required>
+        <input type="number" name="price" placeholder="Price (Ksh)" required>
+        <input type="text" name="description" placeholder="Description">
+        <select name="category_id" id="catSelectAdd" required></select>
+        <input type="file" name="image" accept="image/*">
+        <button type="submit" class="btn-add" style="width: 100%;">Add Dish</button>
+    </form>
+
+    <!-- MANAGE DISHES TABLE -->
+    <h2 style="margin-top: 30px;">Manage Dishes</h2>
+    <table>
+        <thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Category</th><th>Actions</th></tr></thead>
+        <tbody id="dishTableBody"></tbody>
+    </table>
+
+    <script>
+        async function loadAdminData() {
+            const [dishesRes, catRes] = await Promise.all([fetch('/api/menu'), fetch('/api/categories')]);
+            const dishes = await dishesRes.json();
+            const cats = await catRes.json();
+
+            // Populate selects
+            const catSelects = [document.getElementById('catSelectAdd')];
+            catSelects.forEach(sel => {
+                sel.innerHTML = cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            });
+
+            // Populate Category List
+            document.getElementById('catList').innerHTML = cats.map(c => `
+                <span class="cat-item">${c.name} <button class="btn-del-small" onclick="deleteCategory(${c.id})">x</button></span>
+            `).join('') || '<p>No categories yet. Create your first one above!</p>';
+
+            // Populate Dish Table
+            document.getElementById('dishTableBody').innerHTML = dishes.map(d => `
+                <tr>
+                    <td><img src="${d.image_url || 'https://via.placeholder.com/50'}" class="admin-img"></td>
+                    <td>${d.name}</td>
+                    <td>Ksh ${d.price}</td>
+                    <td>${d.categories?.name || 'N/A'}</td>
+                    <td>
+                        <button class="btn btn-add" onclick="deleteDish(${d.id})" style="background:#f39c12;">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Add Category
+        async function addCategory() {
+            const name = document.getElementById('newCatName').value;
+            if(!name) return alert("Please enter a category name");
+            await fetch('/api/admin/categories/add', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name })
+            });
+            document.getElementById('newCatName').value = '';
+            loadAdminData();
+        }
+
+        // Delete Category
+        async function deleteCategory(id) {
+            if(confirm("Are you sure you want to delete this category? All dishes inside it will remain uncategorized.")) {
+                await fetch(`/api/admin/categories/delete/${id}`, { method: 'DELETE' });
+                loadAdminData();
+            }
+        }
+
+        // Add Dish
+        document.getElementById('addDishForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            await fetch('/api/admin/add', { method: 'POST', body: formData });
+            loadAdminData();
+            e.target.reset();
+        });
+
+        // Delete Dish
+        async function deleteDish(id) {
+            if(confirm("Are you sure you want to delete this dish?")) {
+                await fetch(`/api/admin/delete/${id}`, { method: 'DELETE' });
+                loadAdminData();
+            }
+        }
+
+        loadAdminData();
+    </script>
+</body>
+</html>

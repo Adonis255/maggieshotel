@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maggies Hotel & Butchery</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <div class="top-left">
+            <span>📍 G78G+68W, Oginga Odinga St, Eldoret</span>
+            <span>📞 0725 894394</span>
+        </div>
+        <div class="top-right">
+            <span>⭐ 4.7 (1,277 Reviews)</span>
+            <span id="statusBadgeTop" class="status-dot"></span> 
+            <span>6am - 10pm Daily</span>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER -->
+    <header class="main-header">
+        <div class="logo-area">
+            <h1>MAGGIE'S</h1>
+            <p>HOTEL & BUTCHERY</p>
+        </div>
+        <div class="header-actions">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search dishes...">
+            </div>
+            <a href="tel:0725894394" class="btn-reserve">CALL TO ORDER</a>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <h2>Our Food Menu</h2>
+        <p>Authentic Kenyan Flavors • 70+ Signature Dishes • Fresh Daily</p>
+    </section>
+
+    <!-- CATEGORY FILTER -->
+    <section class="category-section">
+        <div id="categoryFilter" class="categories-pill-container">
+            <!-- Categories injected via JS -->
+        </div>
+    </section>
+
+    <!-- MENU GRID -->
+    <div id="menuGrid" class="menu-grid">
+        <!-- Dishes injected via JS -->
+    </div>
+
+    <!-- FIXED CIRCULAR CALL BUTTON -->
+    <a href="tel:0725894394" class="call-button">📞</a>
+
+    <script src="/static/js/script.js"></script>
+</body>
+</html>
