@@ -1,5 +1,4 @@
-flask
-flask-caching
+Flask
+Flask-Caching
 supabase
 python-dotenv
-gunicorn
