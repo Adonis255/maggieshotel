@@ -2,7 +2,6 @@ import os
 import uuid
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for
 from supabase import create_client, Client
-from flask_caching import Cache
 from functools import wraps
 from dotenv import load_dotenv
 
@@ -10,12 +9,8 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
-app.config['CACHE_TYPE'] = 'SimpleCache'
-app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 
-cache = Cache(app)
-
-# Supabase connection
+# Supabase connection (Vercel will inject these via Environment Variables)
 supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 
 # Admin Login Decorator
@@ -32,7 +27,6 @@ def index():
     return render_template('index.html')
 
 @app.route('/api/menu', methods=['GET'])
-@cache.cached(timeout=60)
 def get_menu():
     try:
         response = supabase.table('dishes').select('*, categories(id, name)').execute()
@@ -41,7 +35,6 @@ def get_menu():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/categories', methods=['GET'])
-@cache.cached(timeout=3600)
 def get_categories():
     response = supabase.table('categories').select('*').execute()
     return jsonify(response.data)
@@ -88,7 +81,6 @@ def add_dish():
         'image_url': image_url
     }).execute()
     
-    cache.clear()
     return jsonify({"success": True})
 
 @app.route('/api/admin/update/<int:dish_id>', methods=['POST'])
@@ -112,14 +104,12 @@ def update_dish(dish_id):
         'image_url': image_url
     }).eq('id', dish_id).execute()
     
-    cache.clear()
     return jsonify({"success": True})
 
 @app.route('/api/admin/delete/<int:dish_id>', methods=['DELETE'])
 @admin_required
 def delete_dish(dish_id):
     supabase.table('dishes').delete().eq('id', dish_id).execute()
-    cache.clear()
     return jsonify({"success": True})
 
 @app.route('/api/admin/categories/add', methods=['POST'])
@@ -127,15 +117,18 @@ def delete_dish(dish_id):
 def add_category():
     name = request.json.get('name')
     supabase.table('categories').insert({'name': name}).execute()
-    cache.clear()
     return jsonify({"success": True})
 
 @app.route('/api/admin/categories/delete/<int:cat_id>', methods=['DELETE'])
 @admin_required
 def delete_category(cat_id):
     supabase.table('categories').delete().eq('id', cat_id).execute()
-    cache.clear()
     return jsonify({"success": True})
+
+# ==========================================
+# CRITICAL LINE FOR VERCEL (DO NOT REMOVE)
+# ==========================================
+handler = app
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
