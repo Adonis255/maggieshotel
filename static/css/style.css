@@ -27,8 +27,8 @@
 .hero-section h2 { font-size: 3.5rem; font-weight: bold; margin-bottom: 10px; text-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 .hero-section p { font-size: 1.2rem; font-weight: 300; }
 
-/* === CATEGORY PILLS === */
-.category-section { background: var(--bg-light); padding: 25px 20px; display: flex; justify-content: center; }
+/* === CATEGORY PILLS (Desktop Only) === */
+.category-section { background: var(--bg-light); padding: 25px 20px; display: flex; flex-direction: column; align-items: center; }
 .categories-pill-container { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 1200px; }
 .cat-btn { background: white; color: #333; padding: 10px 20px; border-radius: 30px; border: 1px solid #ddd; cursor: pointer; font-weight: 600; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
 .cat-btn.active, .cat-btn:hover { background: #121212; color: white; border-color: #121212; transform: scale(1.03); }
@@ -37,23 +37,20 @@
 .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; background: var(--bg-dark); }
 .dish-card { background: #1a1a1a; border-radius: 15px; overflow: hidden; border: 1px solid #333; transition: 0.3s; }
 .dish-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 8px 25px rgba(212, 0, 0, 0.3); }
-.dish-card img { width: 100%; height: 200px; object-fit: cover; }
+/* FIXED IMAGE SIZING: Fits entire image, no crop! */
+.dish-card img { width: 100%; height: 200px; object-fit: contain; background: #1a1a1a; display: block; }
 .dish-content { padding: 15px; color: white; }
 .dish-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 5px; }
 .dish-desc { font-size: 0.8rem; color: #999; margin-bottom: 10px; }
 .dish-price { color: var(--primary); font-weight: bold; font-size: 1.1rem; }
 
 /* === FIXED CIRCLE CALL BUTTON === */
-.call-button {
-    position: fixed; bottom: 30px; left: 30px; width: 65px; height: 65px;
-    background: var(--primary); color: white; text-decoration: none;
-    border-radius: 50%; display: flex; justify-content: center; align-items: center;
-    font-size: 2rem; box-shadow: 0 0 25px rgba(212, 0, 0, 0.6);
-    z-index: 9999; transition: all 0.2s ease;
-}
+.call-button { position: fixed; bottom: 30px; left: 30px; width: 65px; height: 65px; background: var(--primary); color: white; text-decoration: none; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 2rem; box-shadow: 0 0 25px rgba(212, 0, 0, 0.6); z-index: 9999; transition: all 0.2s ease; }
 .call-button:hover { transform: scale(1.1); background: #b30000; }
 
-/* === MOBILE === */
+/* ========================================= */
+/* === MOBILE SPECIFIC CHANGES HERE ======== */
+/* ========================================= */
 @media (max-width: 768px) {
     .top-left { display: none; }
     .logo-area h1 { font-size: 1.4rem; }
@@ -61,6 +58,18 @@
     .hero-section h2 { font-size: 2.2rem; }
     .hero-section p { font-size: 1rem; }
     .btn-reserve { font-size: 0.8rem; padding: 8px 15px; }
-    .categories-pill-container { flex-direction: column; align-items: stretch; }
-    .cat-btn { text-align: center; }
+
+    /* Show the dropdown & hide pill buttons */
+    .mobile-cat-select { display: block !important; width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ddd; background: white; font-weight: bold; color: #333; margin-bottom: 10px; }
+    .categories-pill-container .cat-btn:not(.active) { display: none; }
+    .categories-pill-container .cat-btn.active { display: block; width: 100%; padding: 12px; border-radius: 25px; margin-bottom: 5px; background: #121212; color: white; border-color: #121212; }
+
+    /* 2-column grid = 4 dishes visible before scrolling */
+    .menu-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px 10px; }
+    
+    /* Scale image down for mobile */
+    .dish-card img { height: 120px; }
+    .dish-content { padding: 10px; }
+    .dish-title { font-size: 1rem; }
+    .dish-price { font-size: 1rem; }
 }

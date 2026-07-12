@@ -25,17 +25,28 @@ async function fetchMenu() {
 
 function renderCategories() {
     const container = document.getElementById('categoryFilter');
+    const select = document.getElementById('mobileCatSelect');
+    
+    // Reset both
     container.innerHTML = `<button class="cat-btn active" onclick="filterDishes('All')">All Dishes</button>`;
+    select.innerHTML = `<option value="All">All Dishes</option>`;
+    
     allCategories.forEach(cat => {
         container.innerHTML += `<button class="cat-btn" onclick="filterDishes(${cat.id})">${cat.name}</button>`;
+        select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
     });
 }
+
+// Event listener for the Mobile Dropdown
+document.getElementById('mobileCatSelect').addEventListener('change', function() {
+    filterDishes(this.value);
+});
 
 function renderDishes(dishes) {
     const grid = document.getElementById('menuGrid');
     grid.innerHTML = '';
     
-    // FIX EMPTY STATE - Don't show black blank screen!
+    // FIX EMPTY STATE
     if (dishes.length === 0) {
         grid.innerHTML = `
             <div style="grid-column: 1 / -1; text-align: center; color: #ccc; padding: 50px; font-size: 1.2rem;">
@@ -68,7 +79,17 @@ document.getElementById('searchInput').addEventListener('input', (e) => {
 
 function filterDishes(categoryId) {
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-    if(event && event.target) event.target.classList.add('active');
+    // Update the visual states for both desktop and mobile
+    if(event && event.target && event.target.tagName === 'BUTTON') {
+        event.target.classList.add('active');
+    }
+    // Sync the select dropdown if category is passed
+    if(categoryId !== 'All') {
+        document.getElementById('mobileCatSelect').value = categoryId;
+    } else {
+        document.getElementById('mobileCatSelect').value = 'All';
+    }
+    
     if (categoryId === 'All') renderDishes(allDishes);
     else renderDishes(allDishes.filter(d => d.category_id == categoryId));
 }

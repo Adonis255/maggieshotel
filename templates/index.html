@@ -40,8 +40,14 @@
         <p>Authentic Kenyan Flavors • 70+ Signature Dishes • Fresh Daily</p>
     </section>
 
-    <!-- CATEGORY FILTER -->
+    <!-- CATEGORY FILTER (Dropdown for Mobile, Pills for Desktop) -->
     <section class="category-section">
+        <!-- The visible dropdown for mobile -->
+        <select id="mobileCatSelect" class="mobile-cat-select" style="display:none;">
+            <option value="All">All Dishes</option>
+        </select>
+        
+        <!-- The pill buttons for laptop/desktop -->
         <div id="categoryFilter" class="categories-pill-container">
             <!-- Categories injected via JS -->
         </div>
